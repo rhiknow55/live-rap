@@ -13,6 +13,7 @@ from sklearn.decomposition import PCA
 from matplotlib import pyplot
 
 directory = "lyrics/"
+punctuations = [",", "'", ")", ";", "?", ".", ":", "]"]
 
 def create_model():
     # Import training data, which are text files
@@ -85,6 +86,23 @@ def create_rap(filename, model):
 
         finalsentences.append(chosen)
 
-    print(finalsentences[0])
+    # Format the final sentences into a string
+    lyrics = ""
+    for sentence in finalsentences:
+        line = ""
+        for word in sentence:
+            space = " "
+            # Add space before word if it does not have punctuation
+            for p in punctuations:
+                if p in word:
+                    space = ""
+                    break
 
-create_rap("lyrics/eminem-rap-god.txt", model)
+            line += (space + word)
+
+        lyrics += (line + "\n")
+
+    return lyrics
+
+lyrics = create_rap("lyrics/eminem-rap-god.txt", model)
+print(lyrics)
