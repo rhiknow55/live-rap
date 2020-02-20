@@ -7,6 +7,8 @@ import requests
 import urllib.request
 from bs4 import BeautifulSoup # a tool for parsing json and xml
 
+import os
+
 def main():
     # Step 1
     url = "https://www.metrolyrics.com/top100-hiphop.html"
@@ -42,21 +44,22 @@ def get_lyrics(hrefs):
 
         songname = soup.find("h1").text
         # TODO: check if file exists first
-        write_file(songname, lyrics)
+        fullfilepath = filepath + songname + ".txt"
+        if os.path.isfile(fullfilepath):
+            print(fullfilepath, " already exists!")
+        else
+            print("Scraping lyrics of ", songname, "!")
+            write_file(fullfilepath, lyrics)
 
 # Step 3
 lyricsfolder = "/lyrics/"
+filepath = os.path.dirname(os.path.realpath(__file__)) + lyricsfolder
 
-import os
-dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname, lyricsfolder)
-print(filename)
-
-def write_file(filename, text):
-    fullname = lyricsfolder + filename + ".txt"
-    with open(fullname, "w+") as f:
+def write_file(fullfilepath, text):
+    with open(fullfilepath, "w+") as f:
         f.write(text)
 
 
 if __name__ == '__main__':
     main()
+    print("Finished scraping lyrics!")
