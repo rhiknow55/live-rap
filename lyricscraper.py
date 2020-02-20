@@ -47,7 +47,7 @@ def get_lyrics(hrefs):
         fullfilepath = filepath + songname + ".txt"
         if os.path.isfile(fullfilepath):
             print(fullfilepath, " already exists!")
-        else
+        else:
             print("Scraping lyrics of ", songname, "!")
             write_file(fullfilepath, lyrics)
 
