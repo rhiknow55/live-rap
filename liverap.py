@@ -1,6 +1,7 @@
 # custom imports
 from syllablecounter import syllable_count
 from tsneplotter import tsne_plot
+from misc import is_number
 
 # normal imports
 from nltk.tokenize import TweetTokenizer
@@ -8,6 +9,7 @@ tokenizer = TweetTokenizer()
 from random import randint
 import os
 import string
+from num2words import num2words
 
 # word2vec imports
 from gensim.models import Word2Vec
@@ -16,7 +18,6 @@ from matplotlib import pyplot
 
 # contractions
 contractions = {
-"ain't": "am not",
 "aren't": "are not",
 "can't": "cannot",
 "can't've": "cannot have",
@@ -26,7 +27,6 @@ contractions = {
 "couldn't've": "could not have",
 "didn't": "did not",
 "doesn't": "does not",
-"don't": "do not",
 "hadn't": "had not",
 "hadn't've": "had not have",
 "hasn't": "has not",
@@ -35,25 +35,17 @@ contractions = {
 "he'd've": "he would have",
 "he'll": "he will",
 "he'll've": "he will have",
-"he's": "he is",
 "how'd": "how did",
 "how'd'y": "how do you",
 "how'll": "how will",
-"how's": "how is",
-"I'd": "I would",
-"I'd've": "I would have",
-"I'll": "I will",
-"I'll've": "I will have",
-"I'm": "I am",
-"I've": "I have",
+"i'd've": "I would have",
+"i'll": "I will",
+"i'll've": "I will have",
 "isn't": "is not",
 "it'd": "it would",
 "it'd've": "it would have",
 "it'll": "it will",
 "it'll've": "it will have",
-"it's": "it is",
-"let's": "let us",
-"ma'am": "madam",
 "mayn't": "may not",
 "might've": "might have",
 "mightn't": "might not",
@@ -138,7 +130,7 @@ contractions = {
 LYRICS_DIRECTORY = "lyrics/"
 MODELS_DIRECTORY = "models/"
 CREATIONS_DIRECTORY = "/creations/"
-punctuations = [",", "'", ")", ";", "?", ".", ":", "]"]
+invalidtokens = [",", "(", ")", ";", "?", "!", ".", ":", "[", "]", "©"]
 
 # Variable variables
 binaryname = "lyric_model1.bin"
@@ -184,9 +176,6 @@ def create_model():
             sublines = [line.rstrip("\n") for line in f] # rstrip removes the newline and spaces at the right of that string
         lines += sublines
 
-
-
-
     tokenized_sentences = [] # list of lists, where the inner list has tokenized sentences
     for line in lines:
         tokens = tokenizer.tokenize(line) # TODO: Could use a different tokenizer, since this one splits the single quotes
@@ -201,19 +190,20 @@ def create_model():
     return model
 
 # Clean the words
-# 1. Replace numbers - num2word MAYBE
-# 2. Contractions
+# 1. Contractions
+# 2. Replace numbers - num2word MAYBE
 # 3. Remove punctuations - translate
 
 def cleantokens(tokens):
-    # 1 TODO: Not done for now
-
-    # 2 Contractions
     # Gets the contraction or default (which is just the word) if doesn't exist
     res = [contractions.get(word, word) for word in tokens]
-    print(res)
-    # 3
-    # out = s.translate(string.maketrans("",""), string.punctuation)
+
+    # Replace numbers to words
+    res = [num2words(int(word)) if is_number(word) else word for word in res]
+
+    # remove invalid tokens
+    res = [word for word in res if all(it not in word for it in invalidtokens)]
+
     return res
 
 
@@ -225,15 +215,19 @@ def create_rap(filename, model):
     # Count the syllables in each line by tokenizing into words
     syllables = []
     for line in lines:
-        tokens = word_tokenize(line)
+        tokens = tokenizer.tokenize(line)
+        print(tokens)
+        # lowertokens = [token.lower() for token in tokens]
+        # filteredtokens = cleantokens(lowertokens)
 
         count = 0
-        for word in tokens:
+        for word in filteredtokens:
             count += syllable_count(word)
 
         syllables.append(count)
 
     print("lines len: ", len(lines), " | syllables len: ", len(syllables))
+    print(syllables)
 
     # Now create the rap lyric lines by picking words that fit the syllable count
     finalsentences = []
@@ -258,6 +252,7 @@ def create_rap(filename, model):
                     i += 1
                 else:
                     word = "a"
+                    continue
 
             word = model.wv.most_similar(positive=chosen, topn=topn)[i][0] # Need to access the first element of a tuple in a list
 
@@ -268,14 +263,7 @@ def create_rap(filename, model):
     for sentence in finalsentences:
         line = ""
         for word in sentence:
-            space = " "
-            # Add space before word if it does not have punctuation
-            for p in punctuations:
-                if p in word:
-                    space = ""
-                    break
-
-            line += (space + word)
+            line += (" " + word)
 
         lyrics += (line + "\n")
 
