@@ -14,12 +14,27 @@ OPTIONAL:
 Make the lyrics rhyme, so make sure the last word of the sentence rhymes and then work backwards
 
 
-TODO: Use a diff tokenizer that doesn't split single quotes
-https://stackoverflow.com/questions/49499770/nltk-word-tokenizer-treats-ending-single-quote-as-a-separate-word/49506436#49506436
+DONE: Use a diff tokenizer that doesn't split single quotes (TreeTokenizer)
+https://stackoverflow.com/questions/34714162/preventing-splitting-at-apostrophies-when-tokenizing-words-using-nltk?lq=1
 
 
-TODO: Make a rap lyric scraper quickly to speed up process
+DONE: Make a rap lyric scraper quickly to speed up process
 For now just manually
 
 
-TODO: Clean the data more (ex. remove some numbers, brackets, punctuation)
+DONE: Clean the data more (ex. remove some numbers, brackets, punctuation)
+DONE: replace numbers - https://stackoverflow.com/questions/40040177/search-and-replace-numbers-with-words-in-file
+DONE: remove non english
+DONE: punctuation
+
+TODO: omit some contraction replacements that dont impact syllables (ex. ain't)
+
+Uses:
+TweetTokenizer
+gensim
+bs4 from BeautifulSoup
+pycontractions
+num2words
+
+re
+num2words
