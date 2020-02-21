@@ -1,4 +1,4 @@
-# Referred from https://stackoverflow.com/questions/46759492/syllable-count-in-python
+# Starter code from https://stackoverflow.com/questions/46759492/syllable-count-in-python
 def syllable_count(input):
     word = input.lower()
     count = 0
@@ -8,7 +8,7 @@ def syllable_count(input):
     for index in range(1, len(word)):
         if word[index] in vowels and word[index - 1] not in vowels:
             count += 1
-    if word.endswith("e"):
+    if word.endswith("e") and not word.endswith("le"):
         count -= 1
     if count == 0:
         count += 1
