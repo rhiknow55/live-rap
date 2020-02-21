@@ -13,6 +13,9 @@ from gensim.models import Word2Vec
 from sklearn.decomposition import PCA
 from matplotlib import pyplot
 
+# contractions
+from pycontractions import Contractions
+
 LYRICS_DIRECTORY = "lyrics/"
 MODELS_DIRECTORY = "models/"
 CREATIONS_DIRECTORY = "/creations/"
@@ -24,19 +27,23 @@ referencesong = "XXXTENTACION - Changes Lyrics.txt"
 sparsity_threshold = 10 # Number of times a word is presented to be included in model
 topn = 5 # Number of similar words to check
 
+modelbinarypath = MODELS_DIRECTORY + binaryname
 
 def main():
-    fullpath = MODELS_DIRECTORY + binaryname
-    if os.path.isfile(fullpath):
-        p = input("Model " + fullpath + " exists, press (y) to load, or (n) to override and make new model.\n")
-        if p:
-            model = Word2Vec.load(fullpath)
-        else:
-            model = create_model()
+    if os.path.isfile(modelbinarypath):
+        while True:
+            p = input("> Model " + modelbinarypath + " exists, press (o) to override and make a new model, or (l) to load existing model.\n")
+            if p == "o":
+                print("Overriding with new model.")
+                model = create_model()
+                break
+            elif p == "l":
+                print("Loading existing model.")
+                model = Word2Vec.load(modelbinarypath)
+                break
     else:
         model = create_model()
 
-    model.save(fullpath)
     print(model)
 
     # Create rap
@@ -52,29 +59,47 @@ def create_model():
     all_files = os.listdir(LYRICS_DIRECTORY)
     txt_files = [f for f in all_files if f[-4:] == ".txt"]
 
-    lines = []
+    lines = [] # list of lines (strings)
     for filename in txt_files:
         with open(LYRICS_DIRECTORY + filename) as f:
             sublines = [line.rstrip("\n") for line in f] # rstrip removes the newline and spaces at the right of that string
         lines += sublines
 
-    sentences = [] # list of lists, where the inner list has tokenized sentences
+
+
+
+    tokenized_sentences = [] # list of lists, where the inner list has tokenized sentences
     for line in lines:
         tokens = word_tokenize(line) # TODO: Could use a different tokenizer, since this one splits the single quotes
         lowertokens = [token.lower() for token in tokens]
         filteredtokens = cleantokens(lowertokens)
-        sentences.append(filteredtokens)
+        tokenized_sentences.append(filteredtokens)
 
     # Create word2vec model
-    model = Word2Vec(sentences, min_count=sparsity_threshold)
+    model = Word2Vec(tokenized_sentences, min_count=sparsity_threshold)
+    model.save(modelbinarypath)
+
+    # Change contractions
+    cont = Contractions(modelbinarypath)
+    cont.load_models()
+
+    test = list(cont.expand_texts(lines, precise=True))
+    print(test[:5])
+
+
     return model
 
 # Clean the words
-# 1. Remove non english words
-# 2. Replace numbers
-# 3. Remove punctuations
+# 1. Replace numbers - num2word MAYBE
+# 2. Remove punctuations - translate
 def cleantokens(tokens):
-    out = s.translate(string.maketrans("",""), string.punctuation)
+    # 1 TODO: Not done for now
+
+
+    # 2
+    test =""
+    # out = s.translate(string.maketrans("",""), string.punctuation)
+    return tokens
 
 
 def create_rap(filename, model):
