@@ -190,10 +190,6 @@ def create_model():
     return model
 
 # Clean the words
-# 1. Contractions
-# 2. Replace numbers - num2word MAYBE
-# 3. Remove punctuations - translate
-
 def cleantokens(tokens):
     # Gets the contraction or default (which is just the word) if doesn't exist
     res = [contractions.get(word, word) for word in tokens]
@@ -216,18 +212,12 @@ def create_rap(filename, model):
     syllables = []
     for line in lines:
         tokens = tokenizer.tokenize(line)
-        print(tokens)
-        # lowertokens = [token.lower() for token in tokens]
-        # filteredtokens = cleantokens(lowertokens)
 
         count = 0
-        for word in filteredtokens:
+        for word in tokens:
             count += syllable_count(word)
 
         syllables.append(count)
-
-    print("lines len: ", len(lines), " | syllables len: ", len(syllables))
-    print(syllables)
 
     # Now create the rap lyric lines by picking words that fit the syllable count
     finalsentences = []
