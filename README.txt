@@ -1,3 +1,4 @@
+
 Task 1: Make rap lyrics from other lyrics
 1. Download a bunch of popular rap song lyrics, and train a word2vec (CBOW or skip gram) model based on that corpus
 2. Take a new song lyric (and the background track) and keep count of line number and the # of syllables in each line
@@ -11,7 +12,7 @@ Task 2: Rap lyrics from topic
 
 
 OPTIONAL:
-Make the lyrics rhyme, so make sure the last word of the sentence rhymes and then work backwards
+TODO: Make the lyrics rhyme, so make sure the last word of the sentence rhymes and then work backwards
 
 
 DONE: Use a diff tokenizer that doesn't split single quotes (TreeTokenizer)
@@ -27,14 +28,17 @@ DONE: replace numbers - https://stackoverflow.com/questions/40040177/search-and-
 DONE: remove non english
 DONE: punctuation
 
-TODO: omit some contraction replacements that dont impact syllables (ex. ain't)
+DONE: omit some contraction replacements that dont impact syllables (ex. ain't)
+
+TODO: Scrape more songs to have larger model
+TODO: Perhaps censor profanity?
+
+TODO: Prettier read me with screenshots (of non profane lyrics!)
 
 Uses:
 TweetTokenizer
 gensim
 bs4 from BeautifulSoup
-pycontractions
-num2words
 
 re
 num2words

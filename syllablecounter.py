@@ -18,3 +18,5 @@ def syllable_count(input):
     if count == 0:
         count += 1
     return count
+
+# TODO: the counts for "are" and "have" are incorrect
