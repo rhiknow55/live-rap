@@ -2,6 +2,7 @@
 from syllablecounter import syllable_count
 from tsneplotter import tsne_plot
 from misc import is_number
+import rhymefinder as rf
 
 # normal imports
 from nltk.tokenize import TweetTokenizer
@@ -133,6 +134,9 @@ MODELS_DIRECTORY = "models/"
 CREATIONS_DIRECTORY = "/creations/"
 invalidtokens = [",", "(", ")", ";", "?", "!", ".", ":", "[", "]", "©"]
 
+# Rhyming
+rhymedictionary = {}
+
 # Variable variables
 binaryname = "lyric_model1.bin"
 referencesong = "XXXTENTACION - Changes Lyrics.txt"
@@ -181,17 +185,20 @@ def create_model():
     for line in lines:
         tokens = tokenizer.tokenize(line) # TODO: Could use a different tokenizer, since this one splits the single quotes
         lowertokens = [token.lower() for token in tokens]
-        filteredtokens = cleantokens(lowertokens)
+        filteredtokens = clean_tokens(lowertokens)
         tokenized_sentences.append(filteredtokens)
 
     # Create word2vec model
     model = Word2Vec(tokenized_sentences, min_count=sparsity_threshold)
     model.save(modelbinarypath)
 
+    # Create rhyme dictionary
+    create_rhyme_dict(model)
+
     return model
 
 # Clean the words
-def cleantokens(tokens):
+def clean_tokens(tokens):
     # Gets the contraction or default (which is just the word) if doesn't exist
     res = [contractions.get(word, word) for word in tokens]
 
@@ -203,6 +210,24 @@ def cleantokens(tokens):
 
     return res
 
+
+def create_rhyme_dict(model):
+    vocab = list(model.wv.vocab)
+
+    for i in range(len(vocab)):
+        for j in range(i+1, len(vocab)):
+            if rf.is_rhyme(vocab[i], vocab[j]):
+                # Add to both elements' lists
+                add_to_rhyme_dict(vocab[i], vocab[j])
+                add_to_rhyme_dict(vocab[j], vocab[i])
+
+def add_to_rhyme_dict(word, rhymingword):
+    if word not in rhymedictionary.keys():
+        rhymedictionary[word] = []
+
+    rhymedictionary[word].append(rhymingword)
+
+# -----------------------
 
 def create_rap(filename, model):
     fullpath = LYRICS_DIRECTORY + filename
