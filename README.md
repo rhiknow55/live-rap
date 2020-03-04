@@ -77,6 +77,6 @@ DONE: omit some contraction replacements that dont impact syllables (ex. ain't)
 
 TODO: Scrape more songs to have larger model
 
-TODO: Perhaps censor profanity?
+DONE: Perhaps censor profanity?
 
 TODO: Prettier read me with screenshots (of non profane lyrics!)

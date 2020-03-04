@@ -195,6 +195,7 @@ def create_model():
 
     return model
 
+
 # Clean the words
 def clean_tokens(tokens):
     # Gets the contraction or default (which is just the word) if doesn't exist
@@ -205,7 +206,6 @@ def clean_tokens(tokens):
 
     # remove invalid tokens
     res = [word for word in res if all(it not in word for it in invalidtokens)]
-
     res = [word for word in res if word != "'"]
 
     # Remove profanity
