@@ -14,8 +14,22 @@ The purpose of the program is to "create" new rap lyrics based off of a large se
 
 It scrapes lyrics of raps that qualify as English lyrics and creates a word2vec model based on the words belonging to the lyrics.
 
+Then it trains the word tokens by:
+1. Replacing contractions with incorrect syllable count detection
+2. Replacing numbers with words
+3. Removing invalid tokens, usually punctuation
+4. Removing profanity
+
 Once the training is complete, given a song, live-rap TM will create lyrics of the correct syllable count and rhyme that you can now sing during karaoke (causing confusion and awe to everyone else)!
 
+
+## How to use?
+
+First install the dependencies via:
+pip install --user --requirement requirements.txt
+
+then run:
+python liverap.py
 
 
 
@@ -52,21 +66,17 @@ For now just manually
 
 
 DONE: Clean the data more (ex. remove some numbers, brackets, punctuation)
+
 DONE: replace numbers - https://stackoverflow.com/questions/40040177/search-and-replace-numbers-with-words-in-file
+
 DONE: remove non english
+
 DONE: punctuation
 
 DONE: omit some contraction replacements that dont impact syllables (ex. ain't)
 
 TODO: Scrape more songs to have larger model
+
 TODO: Perhaps censor profanity?
 
 TODO: Prettier read me with screenshots (of non profane lyrics!)
-
-Uses:
-TweetTokenizer
-gensim
-bs4 from BeautifulSoup
-
-re
-num2words

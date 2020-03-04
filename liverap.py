@@ -1,8 +1,8 @@
 # custom imports
 from syllablecounter import syllable_count
-from tsneplotter import tsne_plot
 from misc import is_number
 import rhymefinder as rf
+import profanitydetector as profanity
 
 # normal imports
 from nltk.tokenize import TweetTokenizer
@@ -14,8 +14,6 @@ from num2words import num2words
 
 # word2vec imports
 from gensim.models import Word2Vec
-from sklearn.decomposition import PCA
-from matplotlib import pyplot
 
 # contractions
 # We want ONLY to make the translation if the syllable count is wrong
@@ -132,7 +130,7 @@ contractions = {
 LYRICS_DIRECTORY = "lyrics/"
 MODELS_DIRECTORY = "models/"
 CREATIONS_DIRECTORY = "/creations/"
-invalidtokens = [",", "(", ")", ";", "?", "!", ".", ":", "[", "]", "©"]
+invalidtokens = [",", "(", ")", ";", "?", "!", ".", ":", "[", "]", "©", "-"]
 
 # Rhyming
 rhymedictionary = {}
@@ -208,11 +206,17 @@ def clean_tokens(tokens):
     # remove invalid tokens
     res = [word for word in res if all(it not in word for it in invalidtokens)]
 
+    res = [word for word in res if word != "'"]
+
+    # Remove profanity
+    res = [word for word in res if not profanity.is_profanity(word)]
+
     return res
 
 
 def create_rhyme_dict(model):
     vocab = list(model.wv.vocab)
+    print(vocab)
 
     for i in range(len(vocab)):
         for j in range(i+1, len(vocab)):
