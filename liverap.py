@@ -137,7 +137,8 @@ rhymedictionary = {}
 
 # Variable variables
 binaryname = "lyric_model1.bin"
-referencesong = "XXXTENTACION - Changes Lyrics.txt"
+# referencesong = "XXXTENTACION - Changes Lyrics.txt"
+referencesong = "Coolio - Gangsta's Paradise Lyrics.txt"
 sparsity_threshold = 10 # Number of times a word is presented to be included in model
 topn = 5 # Number of similar words to check
 
@@ -159,6 +160,9 @@ def main():
         model = create_model()
 
     print(model)
+
+    # Create rhyme dictionary
+    create_rhyme_dict(model)
 
     # Create rap
     lyrics = create_rap(referencesong, model)
@@ -190,9 +194,6 @@ def create_model():
     model = Word2Vec(tokenized_sentences, min_count=sparsity_threshold)
     model.save(modelbinarypath)
 
-    # Create rhyme dictionary
-    create_rhyme_dict(model)
-
     return model
 
 
@@ -216,7 +217,6 @@ def clean_tokens(tokens):
 
 def create_rhyme_dict(model):
     vocab = list(model.wv.vocab)
-    print(vocab)
 
     for i in range(len(vocab)):
         for j in range(i+1, len(vocab)):
@@ -225,11 +225,16 @@ def create_rhyme_dict(model):
                 add_to_rhyme_dict(vocab[i], vocab[j])
                 add_to_rhyme_dict(vocab[j], vocab[i])
 
+    # print(rhymedictionary)
+
 def add_to_rhyme_dict(word, rhymingword):
     if word not in rhymedictionary.keys():
-        rhymedictionary[word] = []
+        rhymedictionary[word] = [word]
 
     rhymedictionary[word].append(rhymingword)
+
+def has_rhyming_words(word):
+    return word in rhymedictionary.keys()
 
 # -----------------------
 
@@ -238,9 +243,13 @@ def create_rap(filename, model):
     with open(fullpath) as f:
         lines = [line.rstrip("\n") for line in f]
 
+
     # Count the syllables in each line by tokenizing into words
+    # Have to make an association of lines that have the same rhyme
     syllables = []
-    for line in lines:
+    rhymegrouping = {}
+    for linenum in range(len(lines)):
+        line = lines[linenum]
         tokens = tokenizer.tokenize(line)
 
         count = 0
@@ -249,14 +258,57 @@ def create_rap(filename, model):
 
         syllables.append(count)
 
+        # rhymegrouping
+        if count == 0:
+            continue
+
+        foundgroup = False
+        lastword = tokens[len(tokens)-1]
+        for key in rhymegrouping.keys():
+            # If the current lastword rhymes with any of the keys, add to list
+            if rf.is_rhyme(lastword, key):
+                rhymegrouping[key].append(linenum)
+                foundgroup = True
+                break
+
+        if not foundgroup:
+            rhymegrouping[lastword] = [linenum]
+
+    # Set each rhyme group key to one that exists in model
+    rgvalues = list(rhymegrouping.values())
+    keys = rhymedictionary.keys()
+
+    rhymelist = [""] * len(lines)
+    chosenrhymewords = []
+    vocab = list(model.wv.vocab)
+    for values in rgvalues:
+        while word in chosenrhymewords or not has_rhyming_words(word):
+            index = randint(0, len(vocab) - 1)
+            word = vocab[index]
+
+        chosenrhymewords.append(word)
+
+        for linenum in values:
+            rhymelist[linenum] = key
+
     # Now create the rap lyric lines by picking words that fit the syllable count
     finalsentences = []
-    for syl in syllables:
+    for i in range(len(syllables)):
+        syl = syllables[i]
+        if syl == 0:
+            finalsentences.append([])
+            continue
+
         total = syl
 
         # Pick words from model
-        chosen = []
-        vocab = list(model.wv.vocab)
+        chosen = [] # The list of words in a sentence
+        # key = rhymelist[i]
+        # validfirstwords = rhymedictionary[key]
+        # index = randint(0, len(validfirstwords) - 1)
+        #
+        # word = validfirstwords[index]
+
         index = randint(0, len(vocab) - 1)
         word = vocab[index]
 
@@ -288,6 +340,9 @@ def create_rap(filename, model):
         lyrics += (line + "\n")
 
     return lyrics
+
+
+# ---------------------
 
 # Save new liverap to file
 def save_liverap(filename, content):

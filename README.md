@@ -52,7 +52,9 @@ Task 2: Rap lyrics from topic
 OPTIONAL:
 TODO: Make the lyrics rhyme, so make sure the last word of the sentence rhymes and then work backwards
 - Whenever building the model, also create a dictionary of (word in model) to (words that rhyme with that word)
-- Use this to choose the last word of a sentence
+- Use this dictionary to choose words so that they rhyme
+- Also when creating lyrics, make sure the lines that rhyme in the OG lyrics also rhyme in the new lyrics
+  - make a grouping of rhymes dict, which all rhyme to the key. The values is a list of the line #s
 - Now build the sentence from end to front
 
 
